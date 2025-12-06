@@ -11,21 +11,15 @@ export default function AdminLogin() {
     e.preventDefault();
 
     try {
-      const res = await axios.post(
-        `${API}/api/admin/auth/login`,
-        {
-          email: email.trim(),
-          password: password.trim(),
-        }
-      );
+      const res = await axios.post(`${API}/api/admin/auth/login`, {
+        email: email.trim(),
+        password: password.trim(),
+      });
 
       localStorage.setItem("admin_token", res.data.token);
 
       alert("Login successful!");
-
-      // 🔥 Correct redirect for Vercel + Hash Router
-      window.location.href = "/#/admin/packages";
-
+      window.location.href = "/admin/packages"; // ✅ Vercel: no subfolder
     } catch (err) {
       alert(err.response?.data?.msg || "Login failed");
     }

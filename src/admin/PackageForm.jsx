@@ -6,7 +6,7 @@ export default function PackageForm() {
   const { id } = useParams();
   const token = localStorage.getItem("admin_token");
 
-  const API = import.meta.env.VITE_API_URL; // ⭐ FIXED
+  const API = import.meta.env.VITE_API_URL;
 
   const [form, setForm] = useState({
     title: "",
@@ -20,20 +20,14 @@ export default function PackageForm() {
   const [images, setImages] = useState([]);
   const [oldImages, setOldImages] = useState([]);
 
-  /* ------------------------------------------------
-     LOAD PACKAGE WHEN EDIT MODE
-  ------------------------------------------------ */
   useEffect(() => {
     if (!id) return;
 
     const load = async () => {
       try {
-        const res = await axios.get(
-          `${API}/api/admin/packages/${id}`,   // ⭐ URL FIX
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const res = await axios.get(`${API}/api/admin/packages/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         setForm({
           title: res.data.title || "",
@@ -51,11 +45,12 @@ export default function PackageForm() {
     };
 
     load();
-  }, [id, API]);   // ⭐ IMPORTANT FIX
+  }, [id, API]);
 
-  /* ------------------------------------------------
-     SAVE (CREATE OR UPDATE)
-  ------------------------------------------------ */
+  const updateField = (field, val) => {
+    setForm((prev) => ({ ...prev, [field]: val }));
+  };
+
   const save = async (e) => {
     e.preventDefault();
 
@@ -67,11 +62,11 @@ export default function PackageForm() {
         fd.append("images", img);
       }
 
-      let url = `${API}/api/admin/packages`; // ⭐ FIXED
+      let url = `${API}/api/admin/packages`;
       let method = "post";
 
       if (id) {
-        url = `${API}/api/admin/packages/${id}`; // ⭐ FIXED
+        url = `${API}/api/admin/packages/${id}`;
         method = "put";
       }
 
@@ -106,7 +101,7 @@ export default function PackageForm() {
               <img
                 key={i}
                 src={img}
-                alt=""
+                alt="package"
                 className="w-20 h-20 rounded object-cover border"
               />
             ))}
@@ -119,7 +114,7 @@ export default function PackageForm() {
           className="border p-2 w-full"
           placeholder="Title"
           value={form.title}
-          onChange={(e) => setForm({ ...form, title: e.target.value })}
+          onChange={(e) => updateField("title", e.target.value)}
           required
         />
 
@@ -127,44 +122,44 @@ export default function PackageForm() {
           className="border p-2 w-full"
           placeholder="Description"
           value={form.description}
-          onChange={(e) => setForm({ ...form, description: e.target.value })}
+          onChange={(e) => updateField("description", e.target.value)}
         />
 
         <input
-          type="number"
           className="border p-2 w-full"
           placeholder="Price"
+          type="number"
           value={form.price}
-          onChange={(e) => setForm({ ...form, price: e.target.value })}
+          onChange={(e) => updateField("price", e.target.value)}
         />
 
         <input
           className="border p-2 w-full"
           placeholder="Region"
           value={form.region}
-          onChange={(e) => setForm({ ...form, region: e.target.value })}
+          onChange={(e) => updateField("region", e.target.value)}
         />
 
         <input
           className="border p-2 w-full"
           placeholder="Category"
           value={form.category}
-          onChange={(e) => setForm({ ...form, category: e.target.value })}
+          onChange={(e) => updateField("category", e.target.value)}
         />
 
         <input
-          type="number"
           className="border p-2 w-full"
           placeholder="Days"
+          type="number"
           value={form.days}
-          onChange={(e) => setForm({ ...form, days: e.target.value })}
+          onChange={(e) => updateField("days", e.target.value)}
         />
 
         <input
           type="file"
           multiple
-          className="border p-2 w-full"
           onChange={(e) => setImages([...e.target.files])}
+          className="border p-2 w-full"
         />
 
         <button className="bg-indigo-600 text-white px-4 py-2 rounded">

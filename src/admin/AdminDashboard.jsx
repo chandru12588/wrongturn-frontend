@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import {
-  Package,
-  Users,
-  ClipboardList,
-  PlusCircle,
-  Boxes,
-} from "lucide-react";
+import { Boxes, PlusCircle } from "lucide-react";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -16,6 +10,7 @@ export default function AdminDashboard() {
   });
 
   const token = localStorage.getItem("admin_token");
+  const API = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     loadStats();
@@ -23,18 +18,14 @@ export default function AdminDashboard() {
 
   const loadStats = async () => {
     try {
-      // 🔥 PACKAGES COUNT — NOW USING VITE_API_URL
-      const pkgRes = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/admin/packages`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const pkgRes = await axios.get(`${API}/api/admin/packages`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       setStats({
         packages: pkgRes.data.length,
-        bookings: 128,
-        users: 452,
+        bookings: 128, // dummy for now
+        users: 452,    // dummy for now
       });
     } catch (err) {
       console.log(err);
