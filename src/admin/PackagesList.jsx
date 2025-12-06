@@ -5,15 +5,18 @@ export default function PackagesList() {
   const [packagesList, setPackagesList] = useState([]);
   const token = localStorage.getItem("admin_token");
 
+  const API = import.meta.env.VITE_API_URL; // ✅ Correct API base URL
+
   useEffect(() => {
     loadPackages();
   }, []);
 
   const loadPackages = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/api/admin/packages", {
+      const res = await axios.get(`${API}/api/admin/packages`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       setPackagesList(res.data);
     } catch (err) {
       console.log("ERROR:", err);
@@ -24,9 +27,10 @@ export default function PackagesList() {
     if (!window.confirm("Delete?")) return;
 
     try {
-      await axios.delete(`http://localhost:4000/api/admin/packages/${id}`, {
+      await axios.delete(`${API}/api/admin/packages/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       loadPackages();
     } catch (err) {
       console.log(err);

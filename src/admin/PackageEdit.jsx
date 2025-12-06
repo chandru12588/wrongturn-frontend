@@ -8,6 +8,8 @@ export default function PackageEdit() {
   const [newImages, setNewImages] = useState([]);
   const token = localStorage.getItem("admin_token");
 
+  const API = import.meta.env.VITE_API_URL; // ⭐ USE ENV
+
   useEffect(() => {
     loadPackage();
   }, []);
@@ -15,7 +17,7 @@ export default function PackageEdit() {
   const loadPackage = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:4000/api/admin/packages/${id}`,
+        `${API}/api/admin/packages/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -38,7 +40,7 @@ export default function PackageEdit() {
       }
 
       await axios.put(
-        `http://localhost:4000/api/admin/packages/${id}`,
+        `${API}/api/admin/packages/${id}`,
         form,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -60,8 +62,7 @@ export default function PackageEdit() {
       <h2 className="text-xl font-bold mb-4">Edit Package</h2>
 
       <form onSubmit={updatePackage} className="space-y-4">
-        
-        {/* Title */}
+
         <input
           className="border p-2 w-full"
           value={pkg.title}
@@ -69,7 +70,6 @@ export default function PackageEdit() {
           onChange={(e) => setPkg({ ...pkg, title: e.target.value })}
         />
 
-        {/* Description */}
         <textarea
           className="border p-2 w-full"
           value={pkg.description}
@@ -79,7 +79,6 @@ export default function PackageEdit() {
           }
         />
 
-        {/* Price */}
         <input
           className="border p-2 w-full"
           type="number"
@@ -88,7 +87,6 @@ export default function PackageEdit() {
           onChange={(e) => setPkg({ ...pkg, price: e.target.value })}
         />
 
-        {/* Region */}
         <input
           className="border p-2 w-full"
           value={pkg.region}
@@ -96,7 +94,6 @@ export default function PackageEdit() {
           onChange={(e) => setPkg({ ...pkg, region: e.target.value })}
         />
 
-        {/* Category */}
         <input
           className="border p-2 w-full"
           value={pkg.category}
@@ -104,7 +101,6 @@ export default function PackageEdit() {
           onChange={(e) => setPkg({ ...pkg, category: e.target.value })}
         />
 
-        {/* Days */}
         <input
           className="border p-2 w-full"
           type="number"
@@ -113,7 +109,7 @@ export default function PackageEdit() {
           onChange={(e) => setPkg({ ...pkg, days: e.target.value })}
         />
 
-        {/* Existing Images Preview */}
+        {/* Existing images */}
         <div className="flex gap-4">
           {pkg.images?.map((img, i) => (
             <img
@@ -124,7 +120,7 @@ export default function PackageEdit() {
           ))}
         </div>
 
-        {/* Upload New Images */}
+        {/* Upload new images */}
         <input
           type="file"
           className="border p-2 w-full"

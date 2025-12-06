@@ -3,8 +3,10 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 
 export default function PackageForm() {
-  const { id } = useParams(); // <-- if exists => edit mode
+  const { id } = useParams();
   const token = localStorage.getItem("admin_token");
+
+  const API = import.meta.env.VITE_API_URL; // ⭐ FIXED HERE
 
   const [form, setForm] = useState({
     title: "",
@@ -22,12 +24,12 @@ export default function PackageForm() {
      LOAD PACKAGE WHEN EDIT MODE
   ------------------------------------------------ */
   useEffect(() => {
-    if (!id) return; // create mode
+    if (!id) return;
 
     const load = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:4000/api/admin/packages/${id}`,
+          `${API}/api/admin/packages/${id}`, // ⭐ FIXED
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -42,7 +44,7 @@ export default function PackageForm() {
           days: res.data.days || "",
         });
 
-        setOldImages(res.data.images || []); // show existing images
+        setOldImages(res.data.images || []);
       } catch (err) {
         console.error("LOAD ERROR:", err);
       }
@@ -52,7 +54,7 @@ export default function PackageForm() {
   }, [id]);
 
   /* ------------------------------------------------
-     HANDLE FORM INPUT
+     HANDLE INPUT
   ------------------------------------------------ */
   const updateField = (field, val) => {
     setForm((prev) => ({ ...prev, [field]: val }));
@@ -72,11 +74,11 @@ export default function PackageForm() {
         fd.append("images", img);
       }
 
-      let url = "http://localhost:4000/api/admin/packages";
+      let url = `${API}/api/admin/packages`; // ⭐ FIXED
       let method = "post";
 
       if (id) {
-        url = `http://localhost:4000/api/admin/packages/${id}`;
+        url = `${API}/api/admin/packages/${id}`; // ⭐ FIXED
         method = "put";
       }
 
@@ -98,7 +100,7 @@ export default function PackageForm() {
   };
 
   /* ------------------------------------------------
-     RENDER UI
+     UI
   ------------------------------------------------ */
   return (
     <div className="p-6">
@@ -106,7 +108,6 @@ export default function PackageForm() {
         {id ? "Edit Package" : "Add Package"}
       </h2>
 
-      {/* Existing Images Preview */}
       {id && oldImages.length > 0 && (
         <div className="mb-4">
           <h4 className="font-medium mb-2">Existing Images:</h4>

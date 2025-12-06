@@ -1,4 +1,3 @@
-// src/components/Package.jsx
 import React, { useMemo, useState, useEffect } from "react";
 import axios from "axios";
 
@@ -14,17 +13,17 @@ const openWhatsApp = (phone, pkg) => {
 const openMail = (email, pkg) => {
   const subject = `Booking enquiry: ${pkg.title}`;
   const body = `Hi,\n\nI want to enquire/book ${pkg.title}.\nPreferred Dates:\nPeople:\nNotes:\n\nThanks,\n`;
-  window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = `mailto:${email}?subject=${encodeURIComponent(
+    subject
+  )}&body=${encodeURIComponent(body)}`;
 };
 
-/* Small pill */
 const Pill = ({ children }) => (
   <span className="inline-block text-xs px-2 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
     {children}
   </span>
 );
 
-/* ----------------- Component ----------------- */
 export default function PackageList() {
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,11 +32,13 @@ export default function PackageList() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [q, setQ] = useState("");
 
-  /* ----------------- Fetch packages from backend ----------------- */
+  const API = import.meta.env.VITE_API_URL; // ⭐ FIXED
+
+  /* ----------------- Fetch all packages (PUBLIC route) ----------------- */
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await axios.get("http://localhost:4000/api/admin/packages/public/all");
+        const res = await axios.get(`${API}/api/packages`); // ⭐ FIXED
         setPackages(res.data);
       } catch (err) {
         console.log("Error loading packages", err);
@@ -47,27 +48,25 @@ export default function PackageList() {
     load();
   }, []);
 
-  /* ----------------- Create dynamic filters ----------------- */
-  const regions = useMemo(() => {
-    return ["All", ...new Set(packages.map((p) => p.region || "Others"))];
-  }, [packages]);
+  /* ----------------- Filters ----------------- */
+  const regions = useMemo(
+    () => ["All", ...new Set(packages.map((p) => p.region || "Others"))],
+    [packages]
+  );
 
-  const categories = useMemo(() => {
-    return ["All", ...new Set(packages.map((p) => p.category || "Others"))];
-  }, [packages]);
+  const categories = useMemo(
+    () => ["All", ...new Set(packages.map((p) => p.category || "Others"))],
+    [packages]
+  );
 
-  /* ----------------- Filter logic ----------------- */
   const filtered = packages.filter((p) => {
     if (activeRegion !== "All" && p.region !== activeRegion) return false;
     if (activeCategory !== "All" && p.category !== activeCategory) return false;
-
     const txt = `${p.title} ${p.description} ${p.region}`.toLowerCase();
     if (q && !txt.includes(q.toLowerCase())) return false;
-
     return true;
   });
 
-  /* ----------------- Loading state ----------------- */
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh] text-lg">
@@ -76,7 +75,6 @@ export default function PackageList() {
     );
   }
 
-  /* ----------------- UI ----------------- */
   return (
     <div className="max-w-7xl mx-auto p-4">
       <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 text-center">
@@ -89,7 +87,6 @@ export default function PackageList() {
         <aside className="w-full md:w-64 flex-shrink-0">
           <div className="sticky top-20 bg-white border rounded-xl p-4 shadow-sm">
 
-            {/* Search */}
             <label className="block text-sm text-gray-600 mb-2">Search</label>
             <input
               value={q}
@@ -98,7 +95,6 @@ export default function PackageList() {
               className="w-full border px-3 py-2 rounded-lg text-sm"
             />
 
-            {/* Region Filter */}
             <div className="mt-4">
               <h3 className="text-sm font-semibold">States / Regions</h3>
               <div className="flex flex-wrap gap-2 mt-2">
@@ -107,7 +103,9 @@ export default function PackageList() {
                     key={r}
                     onClick={() => setActiveRegion(r)}
                     className={`text-sm px-3 py-1 rounded-full ${
-                      activeRegion === r ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-700"
+                      activeRegion === r
+                        ? "bg-indigo-600 text-white"
+                        : "bg-gray-100 text-gray-700"
                     }`}
                   >
                     {r}
@@ -116,7 +114,6 @@ export default function PackageList() {
               </div>
             </div>
 
-            {/* Category Filter */}
             <div className="mt-4">
               <h3 className="text-sm font-semibold">Category</h3>
               <div className="flex flex-wrap gap-2 mt-2">
@@ -125,7 +122,9 @@ export default function PackageList() {
                     key={c}
                     onClick={() => setActiveCategory(c)}
                     className={`text-sm px-3 py-1 rounded-full ${
-                      activeCategory === c ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-700"
+                      activeCategory === c
+                        ? "bg-indigo-600 text-white"
+                        : "bg-gray-100 text-gray-700"
                     }`}
                   >
                     {c}
@@ -143,8 +142,10 @@ export default function PackageList() {
         {/* Main Content */}
         <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((pkg) => (
-            <div key={pkg._id} className="bg-white rounded-2xl shadow-md hover:shadow-lg border overflow-hidden">
-
+            <div
+              key={pkg._id}
+              className="bg-white rounded-2xl shadow-md hover:shadow-lg border overflow-hidden"
+            >
               <div className="relative aspect-[16/10] w-full overflow-hidden">
                 <img
                   src={pkg.images?.[0]}
@@ -161,7 +162,9 @@ export default function PackageList() {
                   {pkg.description}
                 </p>
 
-                <div className="mt-3 font-bold text-indigo-600">₹ {pkg.price}</div>
+                <div className="mt-3 font-bold text-indigo-600">
+                  ₹ {pkg.price}
+                </div>
 
                 <div className="mt-4 flex items-center gap-3">
                   <button
@@ -185,7 +188,6 @@ export default function PackageList() {
                 >
                   View Details
                 </a>
-
               </div>
             </div>
           ))}
