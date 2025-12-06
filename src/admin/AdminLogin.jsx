@@ -5,14 +5,14 @@ export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const API = import.meta.env.VITE_API_URL; // 👈 dynamic base URL
+  const API = import.meta.env.VITE_API_URL;
 
   const submit = async (e) => {
     e.preventDefault();
 
     try {
       const res = await axios.post(
-        `${API}/api/admin/auth/login`,   // 👈 FIXED
+        `${API}/api/admin/auth/login`,
         {
           email: email.trim(),
           password: password.trim(),
@@ -22,7 +22,10 @@ export default function AdminLogin() {
       localStorage.setItem("admin_token", res.data.token);
 
       alert("Login successful!");
-      window.location.href = "/wrong-turnclub-chandru/admin/packages"; // 👈 GITHUB PAGES FIX
+
+      // 🔥 Correct redirect for Vercel + Hash Router
+      window.location.href = "/#/admin/packages";
+
     } catch (err) {
       alert(err.response?.data?.msg || "Login failed");
     }
