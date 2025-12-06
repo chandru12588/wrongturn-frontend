@@ -4,41 +4,55 @@ import axios from "axios";
 export default function PackagesList() {
   const [packagesList, setPackagesList] = useState([]);
   const token = localStorage.getItem("admin_token");
-  const API = import.meta.env.VITE_API_URL;
 
+  const API = import.meta.env.VITE_API_URL; // ⭐ backend URL
+
+  /* ------------------------------------------------
+     LOAD PACKAGES (FIXED — moved inside useEffect)
+  ------------------------------------------------ */
   useEffect(() => {
-    loadPackages();
+    const loadPackages = async () => {
+      try {
+        const res = await axios.get(`${API}/api/admin/packages`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setPackagesList(res.data);
+      } catch (err) {
+        console.error("LOAD PACKAGES ERROR:", err);
+      }
+    };
+
+    loadPackages(); // ⭐ NO WARNING NOW
   }, []);
 
-  const loadPackages = async () => {
-    try {
-      const res = await axios.get(`${API}/api/admin/packages`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setPackagesList(res.data);
-    } catch (err) {
-      console.log("ERROR:", err);
-    }
-  };
-
+  /* ------------------------------------------------
+     DELETE PACKAGE
+  ------------------------------------------------ */
   const deletePackage = async (id) => {
-    if (!window.confirm("Delete?")) return;
+    if (!window.confirm("Delete this package?")) return;
 
     try {
       await axios.delete(`${API}/api/admin/packages/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      loadPackages();
+
+      // Reload list
+      setPackagesList((prev) => prev.filter((p) => p._id !== id));
     } catch (err) {
-      console.log(err);
+      console.error("DELETE ERROR:", err);
       alert("Delete failed");
     }
   };
 
+  /* ------------------------------------------------
+     UI
+  ------------------------------------------------ */
   return (
     <div className="p-6">
+
       <div className="flex justify-between mb-6">
         <h2 className="text-2xl font-bold">Manage Packages</h2>
+
         <a
           href="/admin/packages/new"
           className="bg-indigo-600 text-white px-4 py-2 rounded-lg"
@@ -56,7 +70,7 @@ export default function PackagesList() {
             <img
               src={pkg.images?.[0]}
               className="w-20 h-20 rounded object-cover"
-              alt=""
+              alt="package"
             />
 
             <div className="ml-4 flex-1">
@@ -82,6 +96,7 @@ export default function PackagesList() {
           </div>
         ))}
       </div>
+
     </div>
   );
 }

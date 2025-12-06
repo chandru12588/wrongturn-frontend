@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Boxes, PlusCircle } from "lucide-react";
+import { Package, Users, ClipboardList, PlusCircle, Boxes } from "lucide-react";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -10,27 +10,28 @@ export default function AdminDashboard() {
   });
 
   const token = localStorage.getItem("admin_token");
-  const API = import.meta.env.VITE_API_URL;
+  const API = import.meta.env.VITE_API_URL; // ✔ backend base URL
 
   useEffect(() => {
+    // Declare async inside effect — React Recommended
+    const loadStats = async () => {
+      try {
+        const pkgRes = await axios.get(`${API}/api/admin/packages`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setStats({
+          packages: pkgRes.data.length,
+          bookings: 128, // static for now
+          users: 452,    // static
+        });
+      } catch (err) {
+        console.error("STATS LOAD ERROR:", err);
+      }
+    };
+
     loadStats();
   }, []);
-
-  const loadStats = async () => {
-    try {
-      const pkgRes = await axios.get(`${API}/api/admin/packages`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      setStats({
-        packages: pkgRes.data.length,
-        bookings: 128, // dummy for now
-        users: 452,    // dummy for now
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   return (
     <div className="p-6">
@@ -39,6 +40,7 @@ export default function AdminDashboard() {
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        {/* Total Packages */}
         <div className="bg-white border rounded-xl p-6 shadow-md">
           <p className="text-gray-500">Total Packages</p>
           <div className="text-4xl font-bold text-indigo-600 mt-2">
@@ -46,6 +48,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
+        {/* Bookings */}
         <div className="bg-white border rounded-xl p-6 shadow-md">
           <p className="text-gray-500">Bookings</p>
           <div className="text-4xl font-bold text-indigo-600 mt-2">
@@ -53,6 +56,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
+        {/* Users */}
         <div className="bg-white border rounded-xl p-6 shadow-md">
           <p className="text-gray-500">Users</p>
           <div className="text-4xl font-bold text-indigo-600 mt-2">
@@ -61,7 +65,10 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* LINKS */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        {/* Manage Packages */}
         <a
           href="/admin/packages"
           className="bg-white border rounded-xl p-8 shadow-lg hover:shadow-xl transition group"
@@ -77,6 +84,7 @@ export default function AdminDashboard() {
           </div>
         </a>
 
+        {/* Add Package */}
         <a
           href="/admin/packages/new"
           className="bg-white border rounded-xl p-8 shadow-lg hover:shadow-xl transition group"
@@ -91,6 +99,7 @@ export default function AdminDashboard() {
             </div>
           </div>
         </a>
+
       </div>
     </div>
   );
